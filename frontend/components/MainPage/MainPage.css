@@ -1,0 +1,30 @@
+.btns {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    /* width: 50%; */
+    padding: 1rem;
+    margin-left: 20%;
+    margin-right: 20%;
+}
+
+#bg-rect {
+    width: 60%;
+    height: 80vh;
+    margin-left: auto;
+    margin-right: auto;
+    /* background-image: url("../../src/assets/bg3.svg"); */
+    /* background-repeat: no-repeat; */
+    /* background-size: contain; */
+    color: #FAFAFA;
+}
+
+#bg-rect h1, 
+#bg-rect p {
+    text-align: center;
+    color: #1D242B !important;
+}
+
+main {
+    margin-top: 2%;
+}
