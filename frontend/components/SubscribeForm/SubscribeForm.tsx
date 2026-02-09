@@ -2,7 +2,11 @@ import { useState } from "react";
 import api from "../../src/api";
 import "./SubscribeForm.css";
 
-const SubscribeForm = () => {
+interface Props {
+  onSuccess: () => void;
+}
+
+const SubscribeForm = ({ onSuccess }: Props) => {
   const [email, setEmail] = useState("");
   const [email2, setEmail2] = useState("");
   const [helperText, setHelperText] = useState("Unsubscribe here");
@@ -11,11 +15,17 @@ const SubscribeForm = () => {
   const addSubscriber = async (email: string) => {
     await api.post("/add_user", { user_email: email });
     alert("Successfully Subscribed!");
+    setEmail("");
+    setEmail2("");
+    onSuccess();
   };
 
   const delSubscriber = async (email: string) => {
     await api.delete("/remove_user", { data: { user_email: email } });
     alert("Successfully Unsubscribed!");
+    setEmail("");
+    setEmail2("");
+    onSuccess();
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
