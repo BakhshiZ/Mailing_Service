@@ -1,5 +1,6 @@
 * {
     color: black;
+    box-sizing: border-box;
 }
 
 form {
@@ -7,15 +8,24 @@ form {
     aspect-ratio: 13 / 10;
     background-color: #ECECEC;
     margin-left: 15%;
+    padding: 5px;
 }
 
-label {
+.form-row {
     display: flex;
+    align-items: center;
     margin-bottom: 20px;
+    padding: 5px;
 }
 
-input {
-    margin-left: auto;
+.form-row label {
+    width: 110px;
+    white-space: nowrap;
+}
+
+.form-row input {
+    flex: 1;       
+    min-width: 0;  
 }
 
 input[type="submit"] {

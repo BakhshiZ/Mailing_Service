@@ -21,16 +21,6 @@ const SubscribeForm = () => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (
-      !email.includes("@") ||
-      !email.includes(".") ||
-      !email2.includes("@") ||
-      !email2.includes(".")
-    ) {
-      alert("Error. invalid email entered. Please check again.");
-      return;
-    }
-
     if (email != email2) {
       alert("Error. Emails are not the same. Please check them again.");
       return;
@@ -68,15 +58,15 @@ const SubscribeForm = () => {
   return (
     <>
       <form onSubmit={handleSubmit}>
-        <label>
-          Email:
-          <input type="text" name="email" onChange={handleChange} />
-        </label>
+        <div className="form-row">
+          <label>Email:</label>
+          <input type="email" name="email" onChange={handleChange} />
+        </div>
 
-        <label>
-          Confirm Email:
-          <input type="text" name="email2" onChange={handleChange2} />
-        </label>
+        <div className="form-row">
+          <label>Confirm Email:</label>
+          <input type="email" name="email2" onChange={handleChange2} />
+        </div>
 
         <input type="submit" className={btn_type} value={btn_label} />
 
