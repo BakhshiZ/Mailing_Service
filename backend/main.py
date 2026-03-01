@@ -7,11 +7,18 @@ from psycopg2 import errors
 import os
 from typing import List
 from dotenv import load_dotenv
+import smtplib
+from email.message import EmailMessage
+import threading
 
 load_dotenv()
 
 class MailingListUser(BaseModel):
     user_email: EmailStr
+
+class BroadcastPayload(BaseModel):
+    subject: str
+    body: str
 
 conn = psycopg2.connect(
     host=os.getenv("DB_HOST"),
@@ -20,8 +27,6 @@ conn = psycopg2.connect(
     password=os.getenv("DB_PASSWORD"),
     port=os.getenv("DB_PORT")
 )
-
-cur = conn.cursor()
 
 mailing_app = FastAPI()
 
@@ -37,6 +42,31 @@ mailing_app.add_middleware(
     allow_headers=["*"]
 )
 
+def send_broadcast_email(subject: str, body:str, recipients: list[str]):
+    smtp_host = os.getenv("SMTP_HOST")
+    smtp_user = os.getenv("SMTP_USER")
+    smtp_port = int(os.getenv("SMTP_PORT"))
+    smtp_password = os.getenv("SMTP_PASSWORD")
+
+    msg = EmailMessage()
+    msg["Subject"] = subject
+    msg["From"] = smtp_user
+    msg["To"] = smtp_user # sending to myself for testing purposes
+    msg["Bcc"] = ", ".join(recipients)
+    msg.set_content(body)
+
+    with smtplib.SMTP(smtp_host, smtp_port) as server:
+        server.starttls()
+        server.login(smtp_user, smtp_password)
+        server.send_message(msg)
+
+def thread_broadcast_func(subject: str, body: str):
+    with conn.cursor() as cur:
+        cur.execute("SELECT email FROM subscriber WHERE subscribed = TRUE;")
+        recipients = [result[0] for result in cur.fetchall()] # list of emails
+
+        if recipients is not None:
+            send_broadcast_email(subject, body, recipients)
 
 @mailing_app.post("/add_user")
 def add_user(payload: MailingListUser):
@@ -49,26 +79,53 @@ def add_user(payload: MailingListUser):
     except errors.UniqueViolation:
         conn.rollback()
         raise HTTPException(status_code=400, detail="Email must be unique")
-    except Exception:
-        raise
-
+    except Exception as e:
+        conn.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
 
 @mailing_app.get('/subscribers')
-def get_subscribers() -> List:
-    cur.execute("SELECT * FROM subscriber WHERE subscribed = True;")
-    return cur.fetchall()
+def get_subscribers():
+    with conn.cursor() as cur:
+        cur.execute(
+            "SELECT COUNT(*) FROM subscriber WHERE subscribed = True;"
+        )
+        result = cur.fetchone()
+
+        if result is None:
+            return {"count": 0}
+
+        return {"count": result[0]}
 
 @mailing_app.delete('/remove_user')
 def remove_subscriber(payload: MailingListUser):
-    with conn.cursor() as cur:
-        cur.execute("DELETE FROM subscriber WHERE email = %s;", (payload.user_email,))
-        deleted = cur.rowcount
-        conn.commit()
+    try:
+        with conn.cursor() as cur:
+            cur.execute("DELETE FROM subscriber WHERE email = %s;", (payload.user_email,))
+            deleted = cur.rowcount
+            conn.commit()
 
-        if deleted == 0:
-            raise HTTPException(status_code=400, detail="Error. Email not found")
+            if deleted == 0:
+                raise HTTPException(status_code=400, detail="Error. Email not found")
 
-    return {"status": "ok"}
+        return {"status": "ok"}
+    
+    except HTTPException:
+        conn.rollback()
+        raise
+
+    except Exception as e:
+        conn.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+
+@mailing_app.post('/broadcast')
+def broadcast(payload: BroadcastPayload):
+    thread = threading.Thread(
+        target=thread_broadcast_func,
+        args=(payload.subject, payload.body)
+    )
+    thread.start()
+
+    return {"status": "broadcast has started"}
 
 if __name__ == '__main__':
     uvicorn.run(app=mailing_app,
