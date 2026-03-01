@@ -73,7 +73,7 @@ SMTP_PORT=587
 MAIL_FROM=yourEmail@gmail.com
 ```
 
-**NOTE:** You must enable 2-Step Verification on Gmail and generate an [**App Password**](https://myaccount.google.com/)
+**NOTE:** You must enable 2-Step Verification on Gmail and generate an [**App Password**](https://myaccount.google.com/apppasswords)
 
 ## 5️⃣ Run Backend
 
