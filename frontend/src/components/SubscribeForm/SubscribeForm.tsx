@@ -1,12 +1,8 @@
 import { useState } from "react";
-import api from "../../src/api";
+import api from "../../api";
 import "./SubscribeForm.css";
 
-interface Props {
-  onSuccess: () => void;
-}
-
-const SubscribeForm = ({ onSuccess }: Props) => {
+const SubscribeForm = () => {
   const [email, setEmail] = useState("");
   const [email2, setEmail2] = useState("");
   const [helperText, setHelperText] = useState("Unsubscribe here");
@@ -17,7 +13,6 @@ const SubscribeForm = ({ onSuccess }: Props) => {
     alert("Successfully Subscribed!");
     setEmail("");
     setEmail2("");
-    onSuccess();
   };
 
   const delSubscriber = async (email: string) => {
@@ -25,7 +20,6 @@ const SubscribeForm = ({ onSuccess }: Props) => {
     alert("Successfully Unsubscribed!");
     setEmail("");
     setEmail2("");
-    onSuccess();
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {

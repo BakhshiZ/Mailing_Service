@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import SubscribeForm from "../SubscribeForm/SubscribeForm";
-import api from "../../src/api";
+import api from "../../api";
 import "./MainPage.css";
 
 const MainPage = () => {
+  const navigate = useNavigate();
   const [showSubForm, setShowSubForm] = useState(false);
   const [subscriberCount, setSubscriberCount] = useState(0);
 
@@ -22,7 +24,7 @@ const MainPage = () => {
   }, []);
 
   const handleClickBroadcastBtn = () => {
-    return;
+    navigate("/broadcast");
   };
 
   return (
@@ -50,9 +52,7 @@ const MainPage = () => {
             </button>
           </div>
         </div>
-        <div id="subform">
-          {showSubForm && <SubscribeForm onSuccess={fetchSubscriberCount} />}
-        </div>
+        <div id="subform">{showSubForm && <SubscribeForm />}</div>
       </div>
     </main>
   );
