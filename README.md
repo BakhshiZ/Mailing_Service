@@ -134,6 +134,7 @@ http://localhost:5173
 # 📌 Author
 
 **Bakhshi Zulfiqar**
+
 Github: https://github.com/BakhshiZ
 
 Built as a full-stack learning project using React + FastAPI.
