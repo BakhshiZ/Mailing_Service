@@ -1,4 +1,4 @@
-#📬 Mailing List Web App
+# Mailing List Web App 📬
 
 This is a full-stack mailing list application built with:
 
